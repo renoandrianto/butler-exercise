@@ -10,9 +10,14 @@ app.get('/', (req, res) => {
 })
 
 app.post('/', (req, res) => {
+		// Remove duplicates from the scenario
+		const unique = [...new Set(req.body.map((a) => JSON.stringify(a)))].map((a) =>
+			JSON.parse(a)
+		);
+
     let tickets = []
 		let count = 0;
-    req.body.forEach((message) => {
+    unique.forEach((message) => {
 				// Boolean to determine if new ticket needs to be created
 				let createNew = true;
 				// Get the last ticket in the array, null if empty
@@ -37,12 +42,14 @@ app.post('/', (req, res) => {
 					if (message.fileUrl) {
 						newTicket.fileUrl.push(message.fileUrl);
 					}
+					// Only create a ticket when there are title and telephone number
 					if (newTicket['tel'] != null && newTicket['title'] != null) {
 						tickets.push(newTicket);
 					}
 				// Else, simply add more context to the description by adding the message along with the timestamp
         } else{
 					lastElement.description.push([message.msg, message.createdAt]);
+					
 					if (message.fileUrl) {
 						lastElement.fileUrl.push(message.fileUrl);
 					}
@@ -54,5 +61,3 @@ app.post('/', (req, res) => {
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
 })
-
-// function rangeValid()
